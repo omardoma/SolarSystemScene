@@ -3,8 +3,10 @@
 #include <glut.h>
 #include <stdlib.h>
 #include <math.h>
-#define DEG2RAD(a) (a * 0.0174532925)
+
 #pragma comment(lib, "legacy_stdio_definitions.lib")
+
+#define DEG2RAD(a) (a * 0.0174532925)
 
 GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7, texID8, texID9, texID10, texID11, texID12;
 static float sun = 0.0;
@@ -21,12 +23,98 @@ int moveUp = 0;
 int width, height;
 float fb = 0.8;
 
+class Vector3f {
+public:
+	float x, y, z;
+
+	Vector3f(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) {
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
+	Vector3f operator+(Vector3f &v) {
+		return Vector3f(x + v.x, y + v.y, z + v.z);
+	}
+
+	Vector3f operator-(Vector3f &v) {
+		return Vector3f(x - v.x, y - v.y, z - v.z);
+	}
+
+	Vector3f operator*(float n) {
+		return Vector3f(x * n, y * n, z * n);
+	}
+
+	Vector3f operator/(float n) {
+		return Vector3f(x / n, y / n, z / n);
+	}
+
+	Vector3f unit() {
+		return *this / sqrt(x * x + y * y + z * z);
+	}
+
+	Vector3f cross(Vector3f v) {
+		return Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+	}
+};
+
+class Camera {
+public:
+	Vector3f eye, center, up;
+
+	Camera(float eyeX = 1.0f, float eyeY = 1.0f, float eyeZ = 1.0f, float centerX = 0.0f, float centerY = 0.0f, float centerZ = 0.0f, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f) {
+		eye = Vector3f(eyeX, eyeY, eyeZ);
+		center = Vector3f(centerX, centerY, centerZ);
+		up = Vector3f(upX, upY, upZ);
+	}
+
+	void moveX(float d) {
+		Vector3f right = up.cross(center - eye).unit();
+		eye = eye + right * d;
+		center = center + right * d;
+	}
+
+	void moveY(float d) {
+		eye = eye + up.unit() * d;
+		center = center + up.unit() * d;
+	}
+
+	void moveZ(float d) {
+		Vector3f view = (center - eye).unit();
+		eye = eye + view * d;
+		center = center + view * d;
+	}
+
+	void rotateX(float a) {
+		Vector3f view = (center - eye).unit();
+		Vector3f right = up.cross(view).unit();
+		view = view * cos(DEG2RAD(a)) + up * sin(DEG2RAD(a));
+		up = view.cross(right);
+		center = eye + view;
+	}
+
+	void rotateY(float a) {
+		Vector3f view = (center - eye).unit();
+		Vector3f right = up.cross(view).unit();
+		view = view * cos(DEG2RAD(a)) + right * sin(DEG2RAD(a));
+		right = view.cross(up);
+		center = eye + view;
+	}
+
+	void look() {
+		gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+	}
+};
+Camera camera;
+
 //initialize opengl
 void initOpenGL()
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+	glShadeModel(GL_SMOOTH);
 }
 
 //draw space means stars with texture stars
@@ -337,7 +425,6 @@ void moveForwardBackward(int loc)
 }
 
 
-
 //keyboard key function
 void keyboard(unsigned char key, int x, int y)
 {
@@ -441,109 +528,6 @@ void loadTextures()
 	loadBMP(&texID12, "textures/sun.bmp", true);
 }
 
-//reshape function
-//void reshape(int width, int height)
-//{
-//	if (height == 0)
-//		height = 1;
-//
-//	width = width;
-//	height = height;
-//
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
-//	glViewport(0, 0, width, height);
-//	gluPerspective(45, 1.0 * (width / height), 1.0, 1000);
-//	glMatrixMode(GL_MODELVIEW);
-//	glLoadIdentity();
-//	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
-//}
-
-
-
-class Vector3f {
-public:
-	float x, y, z;
-
-	Vector3f(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) {
-		x = _x;
-		y = _y;
-		z = _z;
-	}
-
-	Vector3f operator+(Vector3f &v) {
-		return Vector3f(x + v.x, y + v.y, z + v.z);
-	}
-
-	Vector3f operator-(Vector3f &v) {
-		return Vector3f(x - v.x, y - v.y, z - v.z);
-	}
-
-	Vector3f operator*(float n) {
-		return Vector3f(x * n, y * n, z * n);
-	}
-
-	Vector3f operator/(float n) {
-		return Vector3f(x / n, y / n, z / n);
-	}
-
-	Vector3f unit() {
-		return *this / sqrt(x * x + y * y + z * z);
-	}
-
-	Vector3f cross(Vector3f v) {
-		return Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
-	}
-};
-class Camera {
-public:
-	Vector3f eye, center, up;
-
-	Camera(float eyeX = 1.0f, float eyeY = 1.0f, float eyeZ = 1.0f, float centerX = 0.0f, float centerY = 0.0f, float centerZ = 0.0f, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f) {
-		eye = Vector3f(eyeX, eyeY, eyeZ);
-		center = Vector3f(centerX, centerY, centerZ);
-		up = Vector3f(upX, upY, upZ);
-	}
-
-	void moveX(float d) {
-		Vector3f right = up.cross(center - eye).unit();
-		eye = eye + right * d;
-		center = center + right * d;
-	}
-
-	void moveY(float d) {
-		eye = eye + up.unit() * d;
-		center = center + up.unit() * d;
-	}
-
-	void moveZ(float d) {
-		Vector3f view = (center - eye).unit();
-		eye = eye + view * d;
-		center = center + view * d;
-	}
-
-	void rotateX(float a) {
-		Vector3f view = (center - eye).unit();
-		Vector3f right = up.cross(view).unit();
-		view = view * cos(DEG2RAD(a)) + up * sin(DEG2RAD(a));
-		up = view.cross(right);
-		center = eye + view;
-	}
-
-	void rotateY(float a) {
-		Vector3f view = (center - eye).unit();
-		Vector3f right = up.cross(view).unit();
-		view = view * cos(DEG2RAD(a)) + right * sin(DEG2RAD(a));
-		right = view.cross(up);
-		center = eye + view;
-	}
-
-	void look() {
-		gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
-	}
-};
-
-Camera camera;
 void setupCamera(int width, int height) {
 	if (height == 0)
 		height = 1;
@@ -557,6 +541,7 @@ void setupCamera(int width, int height) {
 	glLoadIdentity();
 	camera.look();
 }
+
 void setupLights() {
 	GLfloat ambient[] = { 1.0f, 1.0f, 1.0, 1.0f };
 	GLfloat diffuse[] = { 1.0f, 1.0f, 1.0, 1.0f };
@@ -571,16 +556,11 @@ void setupLights() {
 	GLfloat lightPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
-
-
-
-
 }
 
 //display scene
 void display()
 {
-	//setupCamera();
 	setupLights();
 	if (forwardBackward)
 	{
@@ -607,7 +587,6 @@ void display()
 }
 
 
-
 void main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -624,12 +603,5 @@ void main(int argc, char **argv)
 	loadTextures();
 	initOpenGL();
 	glutTimerFunc(0, rotatePlanets, 0);
-	glEnable(GL_DEPTH_TEST);
-	/*glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);*/
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_COLOR_MATERIAL);
-
-	glShadeModel(GL_SMOOTH);
 	glutMainLoop();
 }
