@@ -6,7 +6,9 @@
 #define DEG2RAD(a) (a * 0.0174532925)
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
-GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7, texID8, texID9, texID10, texID11, texID12 ,texID13, texID14, texID15, texID16, texID17;
+GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7, texID8, texID9, texID10, texID11, texID12 ,texID13, texID14, texID15, texID16, texID17, texID18;
+GLuint texID19, texID20, texID21, texID22, texID23;
+GLuint texID24 , texID25, texID26;
 static float sun = 0.0;
 static float planet = 0.0;
 int sec = 10;
@@ -36,8 +38,14 @@ void drawSpace()
 	glEnable(GL_TEXTURE_2D);
 	if(scene == 1)
 	glBindTexture(GL_TEXTURE_2D, texID1);
-	else if (scene ==2)
-	glBindTexture(GL_TEXTURE_2D, texID13);
+	else if (scene == 2) {
+		glDisable(GL_LIGHTING);
+		glBindTexture(GL_TEXTURE_2D, texID13);
+	}
+	else if (scene == 3)
+	{
+		glBindTexture(GL_TEXTURE_2D, texID19);
+	}
 	glPushMatrix();
 
 	GLUquadricObj * qobj;
@@ -61,6 +69,46 @@ void drawPlanets1()
 {
 	GLUquadric *quad;
 
+	//draw black hole1
+	glPushMatrix();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID24);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glTranslatef(-620.0, 50.0, 0.0);
+	glRotated(-90, 0, 1, 0);
+
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+
+	//gluSphere(quad, 150.0, 100, 100);
+	gluDisk(quad, 0, 150, 100, 100);
+
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+	//draw black hole2
+	glPushMatrix();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID24);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glTranslatef(700.0, 50.0, 0.0);
+	glRotated(90, 0, 1, 0);
+
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+
+	//gluSphere(quad, 150.0, 100, 100);
+	gluDisk(quad, 0, 150, 100, 100);
+
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
 	//draw mercury
 	glPushMatrix();
 
@@ -223,21 +271,21 @@ void drawPlanets1()
 	glPopMatrix();
 
 	//draw pluto
-	glPushMatrix();
+	//glPushMatrix();
 
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texID11);
+	//glEnable(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, texID11);
 
-	quad = gluNewQuadric();
-	gluQuadricTexture(quad, 5);
-	glRotated(n, 0, 1, 0);
-	glTranslatef(-250.0, 1.0, 100.0);
-	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-	gluSphere(quad, 8.0, 100, 100);
+	//quad = gluNewQuadric();
+	//gluQuadricTexture(quad, 5);
+	//glRotated(n, 0, 1, 0);
+	//glTranslatef(-250.0, 1.0, 100.0);
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	//gluSphere(quad, 8.0, 100, 100);
 
-	glDisable(GL_TEXTURE_2D);
+	//glDisable(GL_TEXTURE_2D);
 
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 
@@ -246,13 +294,53 @@ void drawPlanets2()
 {
 	GLUquadric *quad;
 
-	/*
-	loadBMP(&texID13, "textures/cone.bmp", true);
-	loadBMP(&texID14, "textures/str.bmp", true);
-	loadBMP(&texID15, "textures/choc.bmp", true);
-	loadBMP(&texID16, "textures/mix.bmp", true);
-	loadBMP(&texID17, "textures/mango.bmp", true);
-	*/
+	//draw ice hole1
+	glPushMatrix();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID26);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glTranslatef(-620.0, 50.0, 0.0);
+	glRotated(90, 0, 1, 0);
+
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+
+	//gluSphere(quad, 150.0, 100, 100);
+	glDisable(GL_LIGHTING);
+	gluDisk(quad, 50, 150, 100, 100);
+	glDisable(GL_TEXTURE_2D);
+	glColor3d(1, 1, 1);
+	gluDisk(quad, 0, 150, 100, 100);
+	glEnable(GL_LIGHTING);
+
+	glPopMatrix();
+
+	//draw ice hole2
+	glPushMatrix();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID26);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glTranslatef(700.0, 50.0, 0.0);
+	glRotated(-90, 0, 1, 0);
+
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+
+	//gluSphere(quad, 150.0, 100, 100);
+	glDisable(GL_LIGHTING);
+	gluDisk(quad, 50, 150, 100, 100);
+	
+
+
+	glDisable(GL_TEXTURE_2D);
+	glColor3d(1, 1, 1);
+	gluDisk(quad, 0, 150, 100, 100);
+	glEnable(GL_LIGHTING);
+
+	glPopMatrix();
 
 	//draw str
 	glPushMatrix();
@@ -264,7 +352,7 @@ void drawPlanets2()
 	gluQuadricTexture(quad, 50);
 	glRotated(v, 0, 1, 0);
 	glTranslatef(75.0, 0.0, 30.0);
-	GLfloat lightIntensity2[] = { 1.0f, 0.0f, 0.8, 1.0f };
+	GLfloat lightIntensity2[] = { 1.0f, 0.5f, 0.8, 1.0f };
 	GLfloat lightPosition2[] = { 0, 0.0f, 0, 1.0f };
 	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightIntensity2);
@@ -293,11 +381,11 @@ void drawPlanets2()
 	glPopMatrix();
 
 	
-	//draw mix
+	//draw van
 	glPushMatrix();
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texID16);
+	glBindTexture(GL_TEXTURE_2D, texID18);
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 10);
@@ -348,6 +436,130 @@ void drawPlanets2()
 
 	
 }
+
+//draw scene 3 planets
+void drawPlanets3()
+{
+	GLUquadric *quad;
+
+	//draw net1
+	glPushMatrix();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID25);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glTranslatef(-635.0, 50.0, 0.0);
+	glRotated(90, 0, 1, 0);
+
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+
+	//gluSphere(quad, 150.0, 100, 100);
+	gluDisk(quad, 0, 100, 100, 100);
+
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+	//draw net2
+	glPushMatrix();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID25);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glTranslatef(742.0, 50.0, 0.0);
+	glRotated(-90, 0, 1, 0);
+
+	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+
+	//gluSphere(quad, 150.0, 100, 100);
+	gluDisk(quad, 0, 100, 100, 100);
+
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+	//draw tennis
+	glPushMatrix();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID23);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 10);
+	glRotated(me, 0, 1, 0);
+	glTranslatef(-55.0, 0.0, 0.0);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 4.0, 60, 60);
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+
+
+
+	//draw baseball
+	glPushMatrix();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID20);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 10);
+	glRotated(m, 0, 1, 0);
+	glTranslatef(-60.0, 0.5, 180.0);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 4.0, 60, 60);
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+
+
+	//draw basketball
+	glPushMatrix();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID21);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 10);
+	glRotated(j, 0, 1, 0);
+	glTranslatef(-100.0, 0.0, -280.0);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 20.0, 100, 100);
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+
+	//draw soccer ball
+	glPushMatrix();
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID22);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 1);
+	glRotated(s, 0, 1, 0);
+	glTranslatef(300.0, 2.0, -360.0);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 12.0, 100, 100);
+	glRotatef(90, 1.0, 0.0, 0.0);
+	//gluDisk(quad, 20.0, 28.0, 80, 80);
+
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+}
+
 //draw sun and planets
 void drawSunAndPlanets()
 {
@@ -389,6 +601,23 @@ void drawSunAndPlanets()
 		//glRotatef((GLfloat)sun, 0.0, 1.0, 0.0); //rotating sun as well as all planets to Y axis
 		gluSphere(quad, 30.0, 100, 100);
 		
+		glDisable(GL_TEXTURE_2D);
+	}
+	else if (scene == 3)
+	{
+		drawPlanets3();
+		glEnable(GL_TEXTURE_2D);
+		/*glBindTexture(GL_TEXTURE_2D, texID16);*/
+		//glDisable(GL_LIGHTING);
+		//glDisable(GL_LIGHT2);
+		glDisable(GL_LIGHTING);
+		//glEnable(GL_LIGHT2);
+		quad = gluNewQuadric();
+		gluQuadricTexture(quad, 40);
+		glTranslatef(0.0, 0.0, 0.0);
+		//glRotatef((GLfloat)sun, 0.0, 1.0, 0.0); //rotating sun as well as all planets to Y axis
+		gluSphere(quad, 30.0, 100, 100);
+
 		glDisable(GL_TEXTURE_2D);
 	}
 
@@ -439,6 +668,7 @@ void keyboard(unsigned char key, int x, int y)
 		gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
 
 	}
+	
 	/*else if (key == 'w')
 	{
 	Y += 2.0;
@@ -535,12 +765,22 @@ void loadTextures()
 		loadBMP(&texID11, "textures/pluto.bmp", true);
 		loadBMP(&texID12, "textures/sun.bmp", true);
 
-		loadBMP(&texID13, "textures/cone.bmp", true);
+		loadBMP(&texID13, "textures/ice.bmp", true);
 		loadBMP(&texID14, "textures/str.bmp", true);
 		loadBMP(&texID15, "textures/choc.bmp", true);
 		loadBMP(&texID16, "textures/mix.bmp", true);
 		loadBMP(&texID17, "textures/mango.bmp", true);
+		loadBMP(&texID18, "textures/van.bmp", true);
 
+		loadBMP(&texID19, "textures/grd.bmp", true);
+		loadBMP(&texID20, "textures/base.bmp", true);
+		loadBMP(&texID21, "textures/basket.bmp", true);
+		loadBMP(&texID22, "textures/soc.bmp", true);
+		loadBMP(&texID23, "textures/tennis.bmp", true);
+		loadBMP(&texID24, "textures/blackhole.bmp", true);
+		
+		loadBMP(&texID25, "textures/net.bmp", true);
+		loadBMP(&texID26, "textures/ice.bmp", true);
 	
 
 }
