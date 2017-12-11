@@ -91,5 +91,23 @@
     <Image Include="textures\venus.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\str.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\choco.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\cone.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\mango.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\mix.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\van.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
