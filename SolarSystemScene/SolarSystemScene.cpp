@@ -7,22 +7,115 @@
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
 GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7, texID8, texID9, texID10, texID11, texID12 ,texID13, texID14, texID15, texID16, texID17, texID18;
-GLuint texID19, texID20, texID21, texID22, texID23;
-GLuint texID24 , texID25, texID26;
-static float sun = 0.0;
+GLuint texID19, texID20, texID21, texID22, texID23, texID24, texID25, texID26;
+//static float sun = 0.0;
 static float planet = 0.0;
-int sec = 10;
+
 float angle = 0.0;
+int forwardBackward = 0;
 float leftRight = 0.0;
 float X1 = -5.0, Z1 = 150.0;
 float X2 = 0.0, Z2 = -1.0;
 float Y = 35.0;
-float n, u, s, j, m, e, v, me;
-int forwardBackward = 0;
-int moveUp = 0;
+float n, u, s, j, m, e, v, me; //for planet rotation speed around sun
+
+//float xRocket, zRocket;
+
 int width, height;
-float fb = 0.8;
-int scene = 1;
+int scene = 0;
+
+bool firstPerson = false;
+float thirdPersonAngle = 0;
+float rotateThirdPerson = 0;
+
+class Vector3f {
+public:
+	float x, y, z;
+
+	Vector3f(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) {
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
+	Vector3f operator+(Vector3f &v) {
+		return Vector3f(x + v.x, y + v.y, z + v.z);
+	}
+
+	Vector3f operator-(Vector3f &v) {
+		return Vector3f(x - v.x, y - v.y, z - v.z);
+	}
+
+	Vector3f operator*(float n) {
+		return Vector3f(x * n, y * n, z * n);
+	}
+
+	Vector3f operator/(float n) {
+		return Vector3f(x / n, y / n, z / n);
+	}
+
+	Vector3f unit() {
+		return *this / sqrt(x * x + y * y + z * z);
+	}
+
+	Vector3f cross(Vector3f v) {
+		return Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+	}
+};
+class Camera {
+public:
+	Vector3f eye, center, up;
+
+	Camera(float eyeX = 0.0f, float eyeY = 50.0, float eyeZ = 0.0f, float centerX = 0.0f, float centerY = 0.0f, float centerZ = 0.0f, float upX = 0.0f, float upY = 0.0f, float upZ = -1.0f) {
+		eye = Vector3f(eyeX, eyeY, eyeZ);
+		center = Vector3f(centerX, centerY, centerZ);
+		up = Vector3f(upX, upY, upZ);
+	}
+
+	void moveX(float d) {
+		Vector3f right = up.cross(center - eye).unit();
+		eye = eye + right * d;
+		center = center + right * d;
+	}
+
+	void moveY(float d) {
+		eye = eye + up.unit() * d;
+		center = center + up.unit() * d;
+	}
+
+	void moveZ(float d) {
+		Vector3f view = (center - eye).unit();
+		eye = eye + view * d;
+		center = center + view * d;
+	}
+
+	void rotateX(float a) {
+		Vector3f view = (center - eye).unit();
+		Vector3f right = up.cross(view).unit();
+		view = view * cos(DEG2RAD(a)) + up * sin(DEG2RAD(a));
+		up = view.cross(right);
+		center = eye + view;
+	}
+
+	void rotateY(float a) {
+		Vector3f view = (center - eye).unit();
+		Vector3f right = up.cross(view).unit();
+		view = view * cos(DEG2RAD(a)) + right * sin(DEG2RAD(a));
+		right = view.cross(up);
+		center = eye + view;
+	}
+
+	void look() {
+		gluLookAt(
+			eye.x, eye.y, eye.z,
+			center.x, center.y, center.z,
+			up.x, up.y, up.z
+		);
+	}
+};
+
+Camera cameraFirst = Camera(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+Camera cameraThird = Camera(0, 200, 400.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
 //initialize opengl
 void initOpenGL()
@@ -36,28 +129,40 @@ void initOpenGL()
 void drawSpace()
 {
 	glEnable(GL_TEXTURE_2D);
-	if(scene == 1)
-	glBindTexture(GL_TEXTURE_2D, texID1);
-	else if (scene == 2) {
-		glDisable(GL_LIGHTING);
-		glBindTexture(GL_TEXTURE_2D, texID13);
-	}
-	else if (scene == 3)
+
+	if (scene == 0)
 	{
-		glBindTexture(GL_TEXTURE_2D, texID19);
+		glBindTexture(GL_TEXTURE_2D, texID1);
 	}
+	else
+	{
+		if (scene == 1) 
+		{
+			glDisable(GL_LIGHTING);
+			glBindTexture(GL_TEXTURE_2D, texID13);
+		}
+		else
+		{
+			if (scene == 2)
+			{
+				glDisable(GL_LIGHTING);
+
+				glBindTexture(GL_TEXTURE_2D, texID19);
+			}
+		}
+	}
+		
 	glPushMatrix();
 
 	GLUquadricObj * qobj;
 	qobj = gluNewQuadric();
-	glTranslated(50, 0, 0);
-	glRotated(90, 1, 0, 1);
+	//glTranslated(50, 0, 0);
+	//glRotated(90, 1, 0, 1);
 
 	gluQuadricTexture(qobj, true);
 	gluQuadricNormals(qobj, GL_SMOOTH);
 	gluSphere(qobj, 700, 100, 100);
 	gluDeleteQuadric(qobj);
-
 
 	glPopMatrix();
 
@@ -77,7 +182,7 @@ void drawPlanets1()
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 5);
-	glTranslatef(-620.0, 50.0, 0.0);
+	glTranslatef(-680.0, 50.0, 0.0);
 	glRotated(-90, 0, 1, 0);
 
 	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
@@ -97,7 +202,7 @@ void drawPlanets1()
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 5);
-	glTranslatef(700.0, 50.0, 0.0);
+	glTranslatef(680.0, 50.0, 0.0);
 	glRotated(90, 0, 1, 0);
 
 	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
@@ -302,7 +407,7 @@ void drawPlanets2()
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 5);
-	glTranslatef(-620.0, 50.0, 0.0);
+	glTranslatef(-680.0, 50.0, 0.0);
 	glRotated(90, 0, 1, 0);
 
 	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
@@ -324,7 +429,7 @@ void drawPlanets2()
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 5);
-	glTranslatef(700.0, 50.0, 0.0);
+	glTranslatef(680.0, 50.0, 0.0);
 	glRotated(-90, 0, 1, 0);
 
 	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
@@ -415,25 +520,7 @@ void drawPlanets2()
 
 	glPopMatrix();
 
-	////draw saturn
-	//glPushMatrix();
-
-	//glEnable(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, texID8);
-
-	//quad = gluNewQuadric();
-	//gluQuadricTexture(quad, 1);
-	//glRotated(s, 0, 1, 0);
-	//glTranslatef(300.0, 2.0, -360.0);
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-	//gluSphere(quad, 12.0, 100, 100);
-	//glRotatef(90, 1.0, 0.0, 0.0);
-	//gluDisk(quad, 20.0, 28.0, 80, 80);
-
-	//glDisable(GL_TEXTURE_2D);
-
-	//glPopMatrix();
-
+	
 	
 }
 
@@ -444,13 +531,13 @@ void drawPlanets3()
 
 	//draw net1
 	glPushMatrix();
-	glEnable(GL_LIGHTING);
+	glDisable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID25);
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 5);
-	glTranslatef(-635.0, 50.0, 0.0);
+	glTranslatef(-690, 50.0, 0.0);
 	glRotated(90, 0, 1, 0);
 
 	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
@@ -460,6 +547,7 @@ void drawPlanets3()
 
 
 	glDisable(GL_TEXTURE_2D);
+	//glEnable(GL_LIGHTING);
 
 	glPopMatrix();
 
@@ -470,7 +558,7 @@ void drawPlanets3()
 
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 5);
-	glTranslatef(742.0, 50.0, 0.0);
+	glTranslatef(690, 50.0, 0.0);
 	glRotated(-90, 0, 1, 0);
 
 	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
@@ -499,9 +587,6 @@ void drawPlanets3()
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
-
-
-
 
 	//draw baseball
 	glPushMatrix();
@@ -560,6 +645,27 @@ void drawPlanets3()
 	glPopMatrix();
 }
 
+
+// draw rocket
+void drawRocket()
+{
+	glPushMatrix();
+	//glClearColor(1, 1, 1, 1);
+	glColor3d(1, 1, 1);
+	/*glTranslated(X1, 0, Z1);
+	
+
+	glRotated(angle2, 0, 1, 0);
+	
+	glTranslated(X2, Y, Z2 - 10);*/
+	//glTranslated(xRocket, Y, zRocket);
+	glScaled(1, 0.5, 1);
+	glutSolidCube(5);
+
+	glPopMatrix();
+
+
+}
 //draw sun and planets
 void drawSunAndPlanets()
 {
@@ -568,7 +674,7 @@ void drawSunAndPlanets()
 	glPushMatrix();
 
 	glEnable(GL_TEXTURE_2D);
-	if (scene == 1)
+	if (scene == 0)
 	{
 		
 		drawPlanets1();
@@ -586,36 +692,30 @@ void drawSunAndPlanets()
 		glEnable(GL_LIGHT0);
 		glDisable(GL_TEXTURE_2D);
 	}
-	else if (scene == 2)
+	else if (scene == 1)
 	{
 		drawPlanets2();
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, texID16);
-		//glDisable(GL_LIGHTING);
-		//glDisable(GL_LIGHT2);
 		glDisable(GL_LIGHT0);
 		glEnable(GL_LIGHT2);
 		quad = gluNewQuadric();
 		gluQuadricTexture(quad, 40);
 		glTranslatef(0.0, 0.0, 0.0);
-		//glRotatef((GLfloat)sun, 0.0, 1.0, 0.0); //rotating sun as well as all planets to Y axis
 		gluSphere(quad, 30.0, 100, 100);
 		
 		glDisable(GL_TEXTURE_2D);
 	}
-	else if (scene == 3)
+	else if (scene == 2)
 	{
+		glDisable(GL_LIGHT2);
+
 		drawPlanets3();
 		glEnable(GL_TEXTURE_2D);
-		/*glBindTexture(GL_TEXTURE_2D, texID16);*/
-		//glDisable(GL_LIGHTING);
-		//glDisable(GL_LIGHT2);
 		glDisable(GL_LIGHTING);
-		//glEnable(GL_LIGHT2);
 		quad = gluNewQuadric();
 		gluQuadricTexture(quad, 40);
 		glTranslatef(0.0, 0.0, 0.0);
-		//glRotatef((GLfloat)sun, 0.0, 1.0, 0.0); //rotating sun as well as all planets to Y axis
 		gluSphere(quad, 30.0, 100, 100);
 
 		glDisable(GL_TEXTURE_2D);
@@ -628,22 +728,22 @@ void drawSunAndPlanets()
 }
 
 //function that moves you to left & right direction
-void moveLeftRight(float angle)
-{
-	X2 = sin(angle);
-	Z2 = -cos(angle);
-	glLoadIdentity();
-	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
-}
+//void moveLeftRight(float angle)
+//{
+//	/*X2 = sin(angle);
+//	Z2 = -cos(angle);*/
+//	//glLoadIdentity();
+//	//gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+//}
 
 //function that moves you to forward & backward direction
-void moveForwardBackward(int loc)
-{
-	X1 = X1 + loc * (X2)*fb;
-	Z1 = Z1 + loc * (Z2)*fb;
-	glLoadIdentity();
-	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
-}
+//void moveForwardBackward(int value)
+//{
+//	X1 = X1 + value * (X2);
+//	Z1 = Z1 + value * (Z2);
+//	glLoadIdentity();
+//	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+//}
 
 
 
@@ -654,35 +754,40 @@ void keyboard(unsigned char key, int x, int y)
 	{
 		exit(EXIT_SUCCESS);
 	}
-	if (key == 's') {
-		if (scene == 1)
-			scene = 2;
-		else if (scene == 2)
-			scene = 1;
-		glLoadIdentity();
-		 X1 = -5.0, Z1 = 150.0;
-		 X2 = 0.0, Z2 = -1.0;
-		 Y = 35.0;
-		 angle = 0.0;
-		
-		gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
 
+	switch (key) {
+		
+	case 'a':
+		rotateThirdPerson = -0.005;
+		break;
+	case 'd':
+		rotateThirdPerson = 0.005;
+		break;
+	case 's':
+		//cameraFirst.moveZ(-d);
+		scene = (scene+1)%3;
+		
+		break;
+	case 'c':
+		firstPerson = !firstPerson;
+		break;
 	}
-	
-	/*else if (key == 'w')
-	{
-	Y += 2.0;
-	glLoadIdentity();
-	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
 	glutPostRedisplay();
+}
+
+//keyboard up function
+void keyUp(unsigned char key, int x, int y)
+{
+	switch (key) {
+
+	case 'a':
+		rotateThirdPerson = 0;
+		break;
+	case 'd':
+		rotateThirdPerson = 0;
+		break;
 	}
-	else if (key == 's')
-	{
-	Y -= 2.0;
-	glLoadIdentity();
-	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
 	glutPostRedisplay();
-	}*/
 }
 
 //keyboard key pressed function
@@ -698,20 +803,14 @@ void keyPressed(int key, int x, int y)
 	}
 	else if (key == GLUT_KEY_UP)
 	{
-		forwardBackward = 2;
+		forwardBackward = 1;
 	}
 	else if (key == GLUT_KEY_DOWN)
 	{
-		forwardBackward = -2;
+		forwardBackward = -1;
 	}
-	else if (key == GLUT_KEY_UP && key == GLUT_KEY_LEFT)
-	{
-		leftRight = 0.007;
-	}
-	else if (key == GLUT_KEY_UP && key == GLUT_KEY_RIGHT)
-	{
-		leftRight = 0.007;
-	}
+	glutPostRedisplay();
+
 }
 
 //keyboard key released function
@@ -739,14 +838,26 @@ void keyReleased(int key, int x, int y)
 		if (forwardBackward < 0)
 			forwardBackward = 0;
 		break;
+	
 	}
 }
 
 //timer function that rotate planets
 void rotatePlanets(int value)
 {
+	n += 0.04f;
+	u += 0.05;
+	s += 0.07;
+	j += 0.096;
+	m += 0.177;
+	e += 0.22;
+	v += 0.258;
+	me += 0.352;
+	planet += 0.5f;
+	
 	glutPostRedisplay();
-	glutTimerFunc(sec, rotatePlanets, 0);
+	glutTimerFunc(10, rotatePlanets, 0);
+	 
 }
 
 void loadTextures()
@@ -785,26 +896,23 @@ void loadTextures()
 
 }
 
-//reshape function
-void reshape(int width, int height)
-{
-	if (height == 0)
-		height = 1;
 
-	width = width;
-	height = height;
-
+void setupCamera() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glViewport(0, 0, width, height);
-	gluPerspective(75, 1.0 * (width / height), 1, 1400);
+	gluPerspective(75, 1.0 * (1500 / 700), 1, 1400);
+
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+	glLoadIdentity();	
+	if (firstPerson)
+	{
+		cameraFirst.look();
+	}
+	else
+	{
+		cameraThird.look();
+	}
 }
-
-
-
 
 void setupLights() {
 	GLfloat ambient[] = { 1.0f, 1.0f, 1.0, 1.0f };
@@ -820,39 +928,71 @@ void setupLights() {
 	GLfloat lightPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
-
-
-
-
 }
 
 //display scene
 void display()
 {
-	//setupCamera();
+	//glutReshapeFunc(reshape);
+	setupCamera();
 	setupLights();
-	if (forwardBackward)
+	if (forwardBackward!=0)
 	{
-		moveForwardBackward(forwardBackward);
+		int tempX1 = X1 + forwardBackward * (X2);
+		int tempZ1 = Z1 + forwardBackward * (Z2);
+
+		if (tempX1 >= 680 )
+		{
+			scene = ((scene + 1) % 3) ;
+			
+			X1 = -5.0, Z1 = 150.0, X2 = 0.0, Z2 = -1.0;
+			angle = 0;
+			cameraFirst = Camera(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+		}
+		if (tempX1 <= -680)
+		{
+			scene = ((scene + 2) % 3);
+			X1 = -5.0, Z1 = 150.0, X2 = 0.0, Z2 = -1.0;
+			angle = 0;
+			cameraFirst = Camera(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
+		}
+		if (tempX1*tempX1 + tempZ1*tempZ1 < 695 * 695)
+		{
+			X1= X1 + forwardBackward * (X2);
+			Z1 = Z1 + forwardBackward * (Z2);
+			cameraFirst.eye.x = X1;
+			cameraFirst.eye.z = Z1;
+			cameraFirst.center.x = X1 + X2;
+			cameraFirst.center.z = Z1 + Z2;
+		}
+		
 	}
-	if (leftRight)
+	if (leftRight!=0)
 	{
 		angle += leftRight;
-		moveLeftRight(angle);
+		X2 = sin(angle);
+		Z2 = -cos(angle);		
+		cameraFirst.center.x = X1 + X2;
+		cameraFirst.center.z = Z1 + Z2;
 	}
+
+	if (rotateThirdPerson != 0)
+	{
+		thirdPersonAngle += rotateThirdPerson;
+		if (thirdPersonAngle >= 360 || thirdPersonAngle <= -360)
+		{
+			thirdPersonAngle = 0;
+		}
+		cameraThird.eye.z = 400 * cos(thirdPersonAngle);
+		cameraThird.eye.x = 400 * sin(thirdPersonAngle);
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawSpace();
 	drawSunAndPlanets();
+	//drawRocket();
 	glutSwapBuffers();
-	n += 0.04f;
-	u += 0.05;
-	s += 0.07;
-	j += 0.096;
-	m += 0.177;
-	e += 0.22;
-	v += 0.258;
-	me += 0.352;
-	planet += 0.5f;
+	
 }
 
 
@@ -861,21 +1001,18 @@ void main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(800, 500);
+	glutInitWindowSize(1500, 700);
 	glutInitWindowPosition(50, 50);
 	glutCreateWindow("3D Space");
 	glutIgnoreKeyRepeat(1);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
+	glutKeyboardUpFunc(keyUp);
 	glutSpecialFunc(keyPressed);
 	glutSpecialUpFunc(keyReleased);
-	glutReshapeFunc(reshape);
 	loadTextures();
 	initOpenGL();
 	glutTimerFunc(0, rotatePlanets, 0);
-	glEnable(GL_DEPTH_TEST);
-	/*glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);*/
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);
 
