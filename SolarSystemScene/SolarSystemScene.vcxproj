@@ -172,21 +172,30 @@
     <None Include="glew32.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\choco.bmp" />
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\cone.bmp" />
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\mango.bmp" />
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\mix.bmp" />
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\str.bmp" />
+    <Image Include="textures\base.bmp" />
+    <Image Include="textures\basket.bmp" />
+    <Image Include="textures\blackhole.bmp" />
+    <Image Include="textures\choc.bmp" />
+    <Image Include="textures\cone.bmp" />
     <Image Include="textures\earth.bmp" />
+    <Image Include="textures\grd.bmp" />
+    <Image Include="textures\ice.bmp" />
+    <Image Include="textures\icehole.bmp" />
     <Image Include="textures\jupiter.bmp" />
+    <Image Include="textures\mango.bmp" />
     <Image Include="textures\mars.bmp" />
     <Image Include="textures\mercury.bmp" />
+    <Image Include="textures\mix.bmp" />
     <Image Include="textures\moon.bmp" />
     <Image Include="textures\neptune.bmp" />
+    <Image Include="textures\net.bmp" />
     <Image Include="textures\pluto.bmp" />
     <Image Include="textures\saturn.bmp" />
+    <Image Include="textures\soc.bmp" />
     <Image Include="textures\stars.bmp" />
+    <Image Include="textures\str.bmp" />
     <Image Include="textures\sun.bmp" />
+    <Image Include="textures\tennis.bmp" />
     <Image Include="textures\uranus.bmp" />
     <Image Include="textures\van.bmp" />
     <Image Include="textures\venus.bmp" />

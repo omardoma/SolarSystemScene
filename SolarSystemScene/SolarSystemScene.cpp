@@ -3,14 +3,17 @@
 #include <glut.h>
 #include <stdlib.h>
 #include <math.h>
-#define DEG2RAD(a) (a * 0.0174532925)
+
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
-GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7, texID8, texID9, texID10, texID11, texID12 ,texID13, texID14, texID15, texID16, texID17, texID18;
-GLuint texID19, texID20, texID21, texID22, texID23, texID24, texID25, texID26;
+#define DEG2RAD(a) (a * 0.0174532925)
+
+GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7,
+texID8, texID9, texID10, texID11, texID12, texID13, texID14,
+texID15, texID16, texID17, texID18, texID19, texID20, texID21,
+texID22, texID23, texID24, texID25, texID26;
 //static float sun = 0.0;
 static float planet = 0.0;
-
 float angle = 0.0;
 int forwardBackward = 0;
 float leftRight = 0.0;
@@ -18,12 +21,9 @@ float X1 = -5.0, Z1 = 150.0;
 float X2 = 0.0, Z2 = -1.0;
 float Y = 35.0;
 float n, u, s, j, m, e, v, me; //for planet rotation speed around sun
-
 //float xRocket, zRocket;
-
 int width, height;
 int scene = 0;
-
 bool firstPerson = false;
 float thirdPersonAngle = 0;
 float rotateThirdPerson = 0;
@@ -62,6 +62,7 @@ public:
 		return Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
 	}
 };
+
 class Camera {
 public:
 	Vector3f eye, center, up;
@@ -121,8 +122,10 @@ Camera cameraThird = Camera(0, 200, 400.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 void initOpenGL()
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+	glShadeModel(GL_SMOOTH);
 }
 
 //draw space means stars with texture stars
@@ -130,41 +133,18 @@ void drawSpace()
 {
 	glEnable(GL_TEXTURE_2D);
 
-	if (scene == 0)
-	{
-		glBindTexture(GL_TEXTURE_2D, texID1);
+	GLint texID = scene == 0 ? texID1 : (scene == 1 ? texID13 : texID19);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	if (scene != 0) {
+		glDisable(GL_LIGHTING);
 	}
-	else
-	{
-		if (scene == 1) 
-		{
-			glDisable(GL_LIGHTING);
-			glBindTexture(GL_TEXTURE_2D, texID13);
-		}
-		else
-		{
-			if (scene == 2)
-			{
-				glDisable(GL_LIGHTING);
 
-				glBindTexture(GL_TEXTURE_2D, texID19);
-			}
-		}
-	}
-		
-	glPushMatrix();
-
-	GLUquadricObj * qobj;
+	GLUquadricObj *qobj;
 	qobj = gluNewQuadric();
-	//glTranslated(50, 0, 0);
-	//glRotated(90, 1, 0, 1);
-
 	gluQuadricTexture(qobj, true);
 	gluQuadricNormals(qobj, GL_SMOOTH);
 	gluSphere(qobj, 700, 100, 100);
 	gluDeleteQuadric(qobj);
-
-	glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
 }
@@ -172,6 +152,8 @@ void drawSpace()
 //draw all planets using gluSphere() method & also setting textures
 void drawPlanets1()
 {
+	glEnable(GL_LIGHTING);
+
 	GLUquadric *quad;
 
 	//draw black hole1
@@ -184,19 +166,16 @@ void drawPlanets1()
 	gluQuadricTexture(quad, 5);
 	glTranslatef(-680.0, 50.0, 0.0);
 	glRotated(-90, 0, 1, 0);
-
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-
-	//gluSphere(quad, 150.0, 100, 100);
 	gluDisk(quad, 0, 150, 100, 100);
-
 
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 
+
 	//draw black hole2
 	glPushMatrix();
+
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID24);
 
@@ -204,16 +183,12 @@ void drawPlanets1()
 	gluQuadricTexture(quad, 5);
 	glTranslatef(680.0, 50.0, 0.0);
 	glRotated(90, 0, 1, 0);
-
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-
-	//gluSphere(quad, 150.0, 100, 100);
 	gluDisk(quad, 0, 150, 100, 100);
-
 
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
+
 	//draw mercury
 	glPushMatrix();
 
@@ -250,6 +225,7 @@ void drawPlanets1()
 
 	//draw earth
 	glPushMatrix();
+
 	glEnable(GL_LIGHT1);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID4);
@@ -271,14 +247,11 @@ void drawPlanets1()
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID5);
 
-
 	quad = gluNewQuadric();
 	gluQuadricTexture(quad, 1);
 	glRotated(e, 0, 1, 0);
 	glTranslatef(5.0, 0.0, 133.0);
 	GLfloat lightIntensity1[] = { 1.0f, 1.0f, 1.0, 1.0f };
-	/*float moonX = 133 * sin(sun);
-	float moonZ = 133 * cos(sun);*/
 	GLfloat lightPosition1[] = { 0, 0.0f, 0, 1.0f };
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightIntensity1);
@@ -376,21 +349,21 @@ void drawPlanets1()
 	glPopMatrix();
 
 	//draw pluto
-	//glPushMatrix();
+	/*glPushMatrix();
 
-	//glEnable(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, texID11);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID11);
 
-	//quad = gluNewQuadric();
-	//gluQuadricTexture(quad, 5);
-	//glRotated(n, 0, 1, 0);
-	//glTranslatef(-250.0, 1.0, 100.0);
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-	//gluSphere(quad, 8.0, 100, 100);
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+	glRotated(n, 0, 1, 0);
+	glTranslatef(-250.0, 1.0, 100.0);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 8.0, 100, 100);
 
-	//glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 
-	//glPopMatrix();
+	glPopMatrix();*/
 }
 
 
@@ -401,6 +374,7 @@ void drawPlanets2()
 
 	//draw ice hole1
 	glPushMatrix();
+
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID26);
@@ -410,14 +384,15 @@ void drawPlanets2()
 	glTranslatef(-680.0, 50.0, 0.0);
 	glRotated(90, 0, 1, 0);
 
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-
-	//gluSphere(quad, 150.0, 100, 100);
 	glDisable(GL_LIGHTING);
+
 	gluDisk(quad, 50, 150, 100, 100);
+
 	glDisable(GL_TEXTURE_2D);
+
 	glColor3d(1, 1, 1);
 	gluDisk(quad, 0, 150, 100, 100);
+
 	glEnable(GL_LIGHTING);
 
 	glPopMatrix();
@@ -432,24 +407,24 @@ void drawPlanets2()
 	glTranslatef(680.0, 50.0, 0.0);
 	glRotated(-90, 0, 1, 0);
 
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-
-	//gluSphere(quad, 150.0, 100, 100);
 	glDisable(GL_LIGHTING);
-	gluDisk(quad, 50, 150, 100, 100);
-	
 
+	gluDisk(quad, 50, 150, 100, 100);
 
 	glDisable(GL_TEXTURE_2D);
+
 	glColor3d(1, 1, 1);
 	gluDisk(quad, 0, 150, 100, 100);
+
 	glEnable(GL_LIGHTING);
 
 	glPopMatrix();
 
 	//draw str
 	glPushMatrix();
+
 	glDisable(GL_LIGHTING);
+	// glDisable(GL_LIGHT2);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID14);
 
@@ -463,6 +438,7 @@ void drawPlanets2()
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightIntensity2);
 	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
 	gluSphere(quad, 4.5, 40, 40);
+
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT2);
 	glDisable(GL_TEXTURE_2D);
@@ -471,7 +447,7 @@ void drawPlanets2()
 
 	//draw choc
 	glPushMatrix();
-	
+
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID15);
 
@@ -481,11 +457,12 @@ void drawPlanets2()
 	glTranslatef(0.0, 0.0, 120.0);
 	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
 	gluSphere(quad, 5.0, 70, 70);
+
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 
-	
+
 	//draw van
 	glPushMatrix();
 
@@ -519,9 +496,6 @@ void drawPlanets2()
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
-
-	
-	
 }
 
 //draw scene 3 planets
@@ -539,12 +513,7 @@ void drawPlanets3()
 	gluQuadricTexture(quad, 5);
 	glTranslatef(-690, 50.0, 0.0);
 	glRotated(90, 0, 1, 0);
-
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-
-	//gluSphere(quad, 150.0, 100, 100);
 	gluDisk(quad, 0, 100, 100, 100);
-
 
 	glDisable(GL_TEXTURE_2D);
 	//glEnable(GL_LIGHTING);
@@ -560,12 +529,7 @@ void drawPlanets3()
 	gluQuadricTexture(quad, 5);
 	glTranslatef(690, 50.0, 0.0);
 	glRotated(-90, 0, 1, 0);
-
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-
-	//gluSphere(quad, 150.0, 100, 100);
 	gluDisk(quad, 0, 100, 100, 100);
-
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -605,8 +569,6 @@ void drawPlanets3()
 
 	glPopMatrix();
 
-
-
 	//draw basketball
 	glPushMatrix();
 
@@ -624,8 +586,7 @@ void drawPlanets3()
 
 	glPopMatrix();
 
-
-	//draw soccer ball
+	//draw soccerball
 	glPushMatrix();
 
 	glEnable(GL_TEXTURE_2D);
@@ -638,7 +599,6 @@ void drawPlanets3()
 	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
 	gluSphere(quad, 12.0, 100, 100);
 	glRotatef(90, 1.0, 0.0, 0.0);
-	//gluDisk(quad, 20.0, 28.0, 80, 80);
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -653,10 +613,10 @@ void drawRocket()
 	//glClearColor(1, 1, 1, 1);
 	glColor3d(1, 1, 1);
 	/*glTranslated(X1, 0, Z1);
-	
+
 
 	glRotated(angle2, 0, 1, 0);
-	
+
 	glTranslated(X2, Y, Z2 - 10);*/
 	//glTranslated(xRocket, Y, zRocket);
 	glScaled(1, 0.5, 1);
@@ -669,41 +629,44 @@ void drawRocket()
 //draw sun and planets
 void drawSunAndPlanets()
 {
-	
 	GLUquadric *quad;
+
 	glPushMatrix();
 
-	glEnable(GL_TEXTURE_2D);
 	if (scene == 0)
 	{
-		
 		drawPlanets1();
+
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, texID12);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT2);
 		glDisable(GL_LIGHT0);
+
 		quad = gluNewQuadric();
 		gluQuadricTexture(quad, 40);
 		glTranslatef(0.0, 0.0, 0.0);
-		//glRotatef((GLfloat)sun, 0.0, 1.0, 0.0); //rotating sun as well as all planets to Y axis
 		gluSphere(quad, 30.0, 100, 100);
+
 		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT2);
 		glEnable(GL_LIGHT0);
 		glDisable(GL_TEXTURE_2D);
 	}
 	else if (scene == 1)
 	{
 		drawPlanets2();
+
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, texID16);
 		glDisable(GL_LIGHT0);
 		glEnable(GL_LIGHT2);
+
 		quad = gluNewQuadric();
 		gluQuadricTexture(quad, 40);
 		glTranslatef(0.0, 0.0, 0.0);
 		gluSphere(quad, 30.0, 100, 100);
-		
+
 		glDisable(GL_TEXTURE_2D);
 	}
 	else if (scene == 2)
@@ -711,8 +674,10 @@ void drawSunAndPlanets()
 		glDisable(GL_LIGHT2);
 
 		drawPlanets3();
+
 		glEnable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
+
 		quad = gluNewQuadric();
 		gluQuadricTexture(quad, 40);
 		glTranslatef(0.0, 0.0, 0.0);
@@ -721,31 +686,8 @@ void drawSunAndPlanets()
 		glDisable(GL_TEXTURE_2D);
 	}
 
-
-	
-
 	glPopMatrix();
 }
-
-//function that moves you to left & right direction
-//void moveLeftRight(float angle)
-//{
-//	/*X2 = sin(angle);
-//	Z2 = -cos(angle);*/
-//	//glLoadIdentity();
-//	//gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
-//}
-
-//function that moves you to forward & backward direction
-//void moveForwardBackward(int value)
-//{
-//	X1 = X1 + value * (X2);
-//	Z1 = Z1 + value * (Z2);
-//	glLoadIdentity();
-//	gluLookAt(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
-//}
-
-
 
 //keyboard key function
 void keyboard(unsigned char key, int x, int y)
@@ -756,7 +698,7 @@ void keyboard(unsigned char key, int x, int y)
 	}
 
 	switch (key) {
-		
+
 	case 'a':
 		rotateThirdPerson = -0.005;
 		break;
@@ -764,9 +706,7 @@ void keyboard(unsigned char key, int x, int y)
 		rotateThirdPerson = 0.005;
 		break;
 	case 's':
-		//cameraFirst.moveZ(-d);
-		scene = (scene+1)%3;
-		
+		scene = (scene + 1) % 3;
 		break;
 	case 'c':
 		firstPerson = !firstPerson;
@@ -778,8 +718,8 @@ void keyboard(unsigned char key, int x, int y)
 //keyboard up function
 void keyUp(unsigned char key, int x, int y)
 {
-	switch (key) {
-
+	switch (key)
+	{
 	case 'a':
 		rotateThirdPerson = 0;
 		break;
@@ -810,7 +750,6 @@ void keyPressed(int key, int x, int y)
 		forwardBackward = -1;
 	}
 	glutPostRedisplay();
-
 }
 
 //keyboard key released function
@@ -831,14 +770,12 @@ void keyReleased(int key, int x, int y)
 	case GLUT_KEY_UP:
 		if (forwardBackward > 0)
 			forwardBackward = 0;
-
 		break;
 
 	case GLUT_KEY_DOWN:
 		if (forwardBackward < 0)
 			forwardBackward = 0;
 		break;
-	
 	}
 }
 
@@ -854,48 +791,44 @@ void rotatePlanets(int value)
 	v += 0.258;
 	me += 0.352;
 	planet += 0.5f;
-	
+
 	glutPostRedisplay();
 	glutTimerFunc(10, rotatePlanets, 0);
-	 
+
 }
 
 void loadTextures()
 {
-	
-		loadBMP(&texID1, "textures/stars.bmp", true);
-		loadBMP(&texID2, "textures/mercury.bmp", true);
-		loadBMP(&texID3, "textures/venus.bmp", true);
-		loadBMP(&texID4, "textures/earth.bmp", true);
-		loadBMP(&texID5, "textures/moon.bmp", true);
-		loadBMP(&texID6, "textures/mars.bmp", true);
-		loadBMP(&texID7, "textures/jupiter.bmp", true);
-		loadBMP(&texID8, "textures/saturn.bmp", true);
-		loadBMP(&texID9, "textures/uranus.bmp", true);
-		loadBMP(&texID10, "textures/neptune.bmp", true);
-		loadBMP(&texID11, "textures/pluto.bmp", true);
-		loadBMP(&texID12, "textures/sun.bmp", true);
+	loadBMP(&texID1, "textures/stars.bmp", true);
+	loadBMP(&texID2, "textures/mercury.bmp", true);
+	loadBMP(&texID3, "textures/venus.bmp", true);
+	loadBMP(&texID4, "textures/earth.bmp", true);
+	loadBMP(&texID5, "textures/moon.bmp", true);
+	loadBMP(&texID6, "textures/mars.bmp", true);
+	loadBMP(&texID7, "textures/jupiter.bmp", true);
+	loadBMP(&texID8, "textures/saturn.bmp", true);
+	loadBMP(&texID9, "textures/uranus.bmp", true);
+	loadBMP(&texID10, "textures/neptune.bmp", true);
+	loadBMP(&texID11, "textures/pluto.bmp", true);
+	loadBMP(&texID12, "textures/sun.bmp", true);
 
-		loadBMP(&texID13, "textures/ice.bmp", true);
-		loadBMP(&texID14, "textures/str.bmp", true);
-		loadBMP(&texID15, "textures/choc.bmp", true);
-		loadBMP(&texID16, "textures/mix.bmp", true);
-		loadBMP(&texID17, "textures/mango.bmp", true);
-		loadBMP(&texID18, "textures/van.bmp", true);
+	loadBMP(&texID13, "textures/ice.bmp", true);
+	loadBMP(&texID14, "textures/str.bmp", true);
+	loadBMP(&texID15, "textures/choc.bmp", true);
+	loadBMP(&texID16, "textures/mix.bmp", true);
+	loadBMP(&texID17, "textures/mango.bmp", true);
+	loadBMP(&texID18, "textures/van.bmp", true);
 
-		loadBMP(&texID19, "textures/grd.bmp", true);
-		loadBMP(&texID20, "textures/base.bmp", true);
-		loadBMP(&texID21, "textures/basket.bmp", true);
-		loadBMP(&texID22, "textures/soc.bmp", true);
-		loadBMP(&texID23, "textures/tennis.bmp", true);
-		loadBMP(&texID24, "textures/blackhole.bmp", true);
-		
-		loadBMP(&texID25, "textures/net.bmp", true);
-		loadBMP(&texID26, "textures/ice.bmp", true);
-	
+	loadBMP(&texID19, "textures/grd.bmp", true);
+	loadBMP(&texID20, "textures/base.bmp", true);
+	loadBMP(&texID21, "textures/basket.bmp", true);
+	loadBMP(&texID22, "textures/soc.bmp", true);
+	loadBMP(&texID23, "textures/tennis.bmp", true);
+	loadBMP(&texID24, "textures/blackhole.bmp", true);
 
+	loadBMP(&texID25, "textures/net.bmp", true);
+	loadBMP(&texID26, "textures/ice.bmp", true);
 }
-
 
 void setupCamera() {
 	glMatrixMode(GL_PROJECTION);
@@ -903,7 +836,7 @@ void setupCamera() {
 	gluPerspective(75, 1.0 * (1500 / 700), 1, 1400);
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();	
+	glLoadIdentity();
 	if (firstPerson)
 	{
 		cameraFirst.look();
@@ -933,18 +866,17 @@ void setupLights() {
 //display scene
 void display()
 {
-	//glutReshapeFunc(reshape);
 	setupCamera();
 	setupLights();
-	if (forwardBackward!=0)
+	if (forwardBackward != 0)
 	{
 		int tempX1 = X1 + forwardBackward * (X2);
 		int tempZ1 = Z1 + forwardBackward * (Z2);
 
-		if (tempX1 >= 680 )
+		if (tempX1 >= 680)
 		{
-			scene = ((scene + 1) % 3) ;
-			
+			scene = ((scene + 1) % 3);
+
 			X1 = -5.0, Z1 = 150.0, X2 = 0.0, Z2 = -1.0;
 			angle = 0;
 			cameraFirst = Camera(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
@@ -958,24 +890,22 @@ void display()
 		}
 		if (tempX1*tempX1 + tempZ1*tempZ1 < 695 * 695)
 		{
-			X1= X1 + forwardBackward * (X2);
+			X1 = X1 + forwardBackward * (X2);
 			Z1 = Z1 + forwardBackward * (Z2);
 			cameraFirst.eye.x = X1;
 			cameraFirst.eye.z = Z1;
 			cameraFirst.center.x = X1 + X2;
 			cameraFirst.center.z = Z1 + Z2;
 		}
-		
 	}
-	if (leftRight!=0)
+	if (leftRight != 0)
 	{
 		angle += leftRight;
 		X2 = sin(angle);
-		Z2 = -cos(angle);		
+		Z2 = -cos(angle);
 		cameraFirst.center.x = X1 + X2;
 		cameraFirst.center.z = Z1 + Z2;
 	}
-
 	if (rotateThirdPerson != 0)
 	{
 		thirdPersonAngle += rotateThirdPerson;
@@ -986,16 +916,13 @@ void display()
 		cameraThird.eye.z = 400 * cos(thirdPersonAngle);
 		cameraThird.eye.x = 400 * sin(thirdPersonAngle);
 	}
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawSpace();
 	drawSunAndPlanets();
 	//drawRocket();
 	glutSwapBuffers();
-	
+
 }
-
-
 
 void main(int argc, char **argv)
 {
@@ -1013,9 +940,5 @@ void main(int argc, char **argv)
 	loadTextures();
 	initOpenGL();
 	glutTimerFunc(0, rotatePlanets, 0);
-	glEnable(GL_NORMALIZE);
-	glEnable(GL_COLOR_MATERIAL);
-
-	glShadeModel(GL_SMOOTH);
 	glutMainLoop();
 }

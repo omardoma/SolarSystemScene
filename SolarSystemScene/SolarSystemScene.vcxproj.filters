@@ -91,22 +91,49 @@
     <Image Include="textures\venus.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\str.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\choco.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\cone.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\mango.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\SolarSystemScene-master\SolarSystemScene\textures\mix.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="textures\van.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\base.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\basket.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\blackhole.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\choc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\cone.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\grd.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\ice.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\icehole.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\mango.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\mix.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\net.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\soc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\str.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\tennis.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
