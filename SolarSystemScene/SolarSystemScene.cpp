@@ -7,7 +7,7 @@
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
 GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7, texID8, texID9, texID10, texID11, texID12 ,texID13, texID14, texID15, texID16, texID17, texID18;
-GLuint texID19, texID20, texID21, texID22, texID23, texID24, texID25, texID26;
+GLuint texID19, texID20, texID21, texID22, texID23, texID24, texID25, texID26, texID27, texID28, texID29;
 //static float sun = 0.0;
 static float planet = 0.0;
 
@@ -19,7 +19,8 @@ float X2 = 0.0, Z2 = -1.0;
 float Y = 35.0;
 float n, u, s, j, m, e, v, me; //for planet rotation speed around sun
 
-//float xRocket, zRocket;
+float metX=-750, metZ, metAngle;
+
 
 int width, height;
 int scene = 0;
@@ -27,6 +28,7 @@ int scene = 0;
 bool firstPerson = false;
 float thirdPersonAngle = 0;
 float rotateThirdPerson = 0;
+
 
 class Vector3f {
 public:
@@ -116,6 +118,9 @@ public:
 
 Camera cameraFirst = Camera(X1, Y, Z1, X1 + X2, Y, Z1 + Z2, 0.0f, 1.0f, 0.0f);
 Camera cameraThird = Camera(0, 200, 400.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+
+//Camera cameraThird = Camera(0, Y+10, 0, 0.0f, Y, 0.0f, 1.0f, 0.0f, 0.0f);
+
 
 //initialize opengl
 void initOpenGL()
@@ -375,22 +380,41 @@ void drawPlanets1()
 
 	glPopMatrix();
 
-	//draw pluto
-	//glPushMatrix();
+	//draw meteroid1
+	glPushMatrix();
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID28);
 
-	//glEnable(GL_TEXTURE_2D);
-	//glBindTexture(GL_TEXTURE_2D, texID11);
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+//	glRotated(n, 0, 1, 0);
+	glTranslatef(metX, Y+50, metZ);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 8.0, 100, 100);
 
-	//quad = gluNewQuadric();
-	//gluQuadricTexture(quad, 5);
-	//glRotated(n, 0, 1, 0);
-	//glTranslatef(-250.0, 1.0, 100.0);
-	//glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
-	//gluSphere(quad, 8.0, 100, 100);
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
 
-	//glDisable(GL_TEXTURE_2D);
+	glPopMatrix();
 
-	//glPopMatrix();
+	//draw meteroid2
+	glPushMatrix();
+	glDisable(GL_LIGHTING);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texID29);
+
+	quad = gluNewQuadric();
+	gluQuadricTexture(quad, 5);
+//	glRotated(n, 0, 1, 0);
+	glTranslatef(-metX, Y+100, metZ);
+	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
+	gluSphere(quad, 8.0, 100, 100);
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
+
+	glPopMatrix();
 }
 
 
@@ -531,7 +555,7 @@ void drawPlanets3()
 
 	//draw net1
 	glPushMatrix();
-	glDisable(GL_LIGHTING);
+	//glDisable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID25);
 
@@ -650,15 +674,11 @@ void drawPlanets3()
 void drawRocket()
 {
 	glPushMatrix();
-	//glClearColor(1, 1, 1, 1);
 	glColor3d(1, 1, 1);
-	/*glTranslated(X1, 0, Z1);
+	glTranslated(X1+X2, Y, Z1+Z2);
+	//glTranslated(0, Y, 0);
 	
-
-	glRotated(angle2, 0, 1, 0);
-	
-	glTranslated(X2, Y, Z2 - 10);*/
-	//glTranslated(xRocket, Y, zRocket);
+	glRotated(-angle*57.3, 0, 1, 0);
 	glScaled(1, 0.5, 1);
 	glutSolidCube(5);
 
@@ -709,16 +729,22 @@ void drawSunAndPlanets()
 	else if (scene == 2)
 	{
 		glDisable(GL_LIGHT2);
-
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT3);
 		drawPlanets3();
+		glDisable(GL_LIGHT3);
+
+		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texID27);
 		glDisable(GL_LIGHTING);
 		quad = gluNewQuadric();
 		gluQuadricTexture(quad, 40);
-		glTranslatef(0.0, 0.0, 0.0);
+		glTranslatef(0.0, 150.0, 0.0);
+		glRotated(90, 1, 0, 0);
 		gluSphere(quad, 30.0, 100, 100);
-
 		glDisable(GL_TEXTURE_2D);
+		glPopMatrix();
 	}
 
 
@@ -855,6 +881,14 @@ void rotatePlanets(int value)
 	me += 0.352;
 	planet += 0.5f;
 	
+	metAngle += 0.01;
+	metX += 1;
+	metZ = 100*sin(metAngle);
+	if (metX == 750)
+	{
+		metX = -750;
+	}
+
 	glutPostRedisplay();
 	glutTimerFunc(10, rotatePlanets, 0);
 	 
@@ -892,7 +926,12 @@ void loadTextures()
 		
 		loadBMP(&texID25, "textures/net.bmp", true);
 		loadBMP(&texID26, "textures/ice.bmp", true);
-	
+
+
+		loadBMP(&texID27, "textures/stdlight.bmp", true);
+		loadBMP(&texID28, "textures/met1.bmp", true);
+		loadBMP(&texID29, "textures/met2.bmp", true);
+
 
 }
 
@@ -928,6 +967,13 @@ void setupLights() {
 	GLfloat lightPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
+
+	GLfloat lightIntensity3[] = { 1.0f, 1.0f, 1.0, 1.0f };
+	GLfloat lightPosition3[] = { 0.0f, 150.0f, 0.0f, 1.0f };
+	glLightfv(GL_LIGHT3, GL_POSITION, lightPosition3);
+	glLightfv(GL_LIGHT3, GL_DIFFUSE, lightIntensity3);
+
+
 }
 
 //display scene
@@ -990,7 +1036,7 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawSpace();
 	drawSunAndPlanets();
-	//drawRocket();
+	drawRocket();
 	glutSwapBuffers();
 	
 }
