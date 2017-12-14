@@ -1,5 +1,6 @@
-#include "stdafx.h"
 #include "TextureBuilder.h"
+#include "Model_3DS.h"
+#include "GLTexture.h"
 #include <glut.h>
 #include <stdlib.h>
 #include <math.h>
@@ -12,6 +13,7 @@ GLuint texID1, texID2, texID3, texID4, texID5, texID6, texID7,
 texID8, texID9, texID10, texID11, texID12, texID13, texID14,
 texID15, texID16, texID17, texID18, texID19, texID20, texID21,
 texID22, texID23, texID24, texID25, texID26;
+Model_3DS model_rocket;
 //static float sun = 0.0;
 static float planet = 0.0;
 float angle = 0.0;
@@ -21,7 +23,7 @@ float X1 = -5.0, Z1 = 150.0;
 float X2 = 0.0, Z2 = -1.0;
 float Y = 35.0;
 float n, u, s, j, m, e, v, me; //for planet rotation speed around sun
-//float xRocket, zRocket;
+float xRocket, zRocket;
 int width, height;
 int scene = 0;
 bool firstPerson = false;
@@ -131,6 +133,8 @@ void initOpenGL()
 //draw space means stars with texture stars
 void drawSpace()
 {
+	glPushMatrix();
+
 	glEnable(GL_TEXTURE_2D);
 
 	GLint texID = scene == 0 ? texID1 : (scene == 1 ? texID13 : texID19);
@@ -147,13 +151,13 @@ void drawSpace()
 	gluDeleteQuadric(qobj);
 
 	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
 }
 
 //draw all planets using gluSphere() method & also setting textures
 void drawPlanets1()
 {
-	glEnable(GL_LIGHTING);
-
 	GLUquadric *quad;
 
 	//draw black hole1
@@ -236,6 +240,7 @@ void drawPlanets1()
 	glTranslatef(0.0, 0.0, 120.0);
 	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
 	gluSphere(quad, 5.0, 70, 70);
+
 	glDisable(GL_LIGHT1);
 	glDisable(GL_TEXTURE_2D);
 
@@ -251,10 +256,6 @@ void drawPlanets1()
 	gluQuadricTexture(quad, 1);
 	glRotated(e, 0, 1, 0);
 	glTranslatef(5.0, 0.0, 133.0);
-	GLfloat lightIntensity1[] = { 1.0f, 1.0f, 1.0, 1.0f };
-	GLfloat lightPosition1[] = { 0, 0.0f, 0, 1.0f };
-	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightIntensity1);
 	gluSphere(quad, 1.5, 40, 40);
 
 	glDisable(GL_TEXTURE_2D);
@@ -374,7 +375,6 @@ void drawPlanets2()
 
 	//draw ice hole1
 	glPushMatrix();
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texID26);
@@ -432,10 +432,6 @@ void drawPlanets2()
 	gluQuadricTexture(quad, 50);
 	glRotated(v, 0, 1, 0);
 	glTranslatef(75.0, 0.0, 30.0);
-	GLfloat lightIntensity2[] = { 1.0f, 0.5f, 0.8, 1.0f };
-	GLfloat lightPosition2[] = { 0, 0.0f, 0, 1.0f };
-	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
-	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightIntensity2);
 	glRotatef((GLfloat)planet, 0.0, 1.0, 0.0);
 	gluSphere(quad, 4.5, 40, 40);
 
@@ -605,27 +601,6 @@ void drawPlanets3()
 	glPopMatrix();
 }
 
-
-// draw rocket
-void drawRocket()
-{
-	glPushMatrix();
-	//glClearColor(1, 1, 1, 1);
-	glColor3d(1, 1, 1);
-	/*glTranslated(X1, 0, Z1);
-
-
-	glRotated(angle2, 0, 1, 0);
-
-	glTranslated(X2, Y, Z2 - 10);*/
-	//glTranslated(xRocket, Y, zRocket);
-	glScaled(1, 0.5, 1);
-	glutSolidCube(5);
-
-	glPopMatrix();
-
-
-}
 //draw sun and planets
 void drawSunAndPlanets()
 {
@@ -687,6 +662,21 @@ void drawSunAndPlanets()
 	}
 
 	glPopMatrix();
+}
+
+// draw rocket
+void drawRocket()
+{
+	if (!firstPerson)
+	{
+		glPushMatrix();
+		glColor3d(1, 1, 1);
+		glTranslated(X1 + X2, Y, Z1 + Z2);
+		glRotated(-angle*57.3, 0, 1, 0);
+		glScaled(5, 5, 5);
+		model_rocket.Draw();
+		glPopMatrix();
+	}
 }
 
 //keyboard key function
@@ -797,7 +787,7 @@ void rotatePlanets(int value)
 
 }
 
-void loadTextures()
+void loadAssets()
 {
 	loadBMP(&texID1, "textures/stars.bmp", true);
 	loadBMP(&texID2, "textures/mercury.bmp", true);
@@ -828,6 +818,8 @@ void loadTextures()
 
 	loadBMP(&texID25, "textures/net.bmp", true);
 	loadBMP(&texID26, "textures/ice.bmp", true);
+
+	model_rocket.Load("Models/rocket/tiefighter.3ds");
 }
 
 void setupCamera() {
@@ -861,6 +853,16 @@ void setupLights() {
 	GLfloat lightPosition[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightIntensity);
+
+	GLfloat lightIntensity1[] = { 1.0f, 1.0f, 1.0, 1.0f };
+	GLfloat lightPosition1[] = { 0, 0.0f, 0, 1.0f };
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightIntensity1);
+
+	GLfloat lightIntensity2[] = { 1.0f, 0.5f, 0.8, 1.0f };
+	GLfloat lightPosition2[] = { 0, 0.0f, 0, 1.0f };
+	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition2);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightIntensity2);
 }
 
 //display scene
@@ -919,7 +921,7 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawSpace();
 	drawSunAndPlanets();
-	//drawRocket();
+	drawRocket();
 	glutSwapBuffers();
 
 }
@@ -937,7 +939,7 @@ void main(int argc, char **argv)
 	glutKeyboardUpFunc(keyUp);
 	glutSpecialFunc(keyPressed);
 	glutSpecialUpFunc(keyReleased);
-	loadTextures();
+	loadAssets();
 	initOpenGL();
 	glutTimerFunc(0, rotatePlanets, 0);
 	glutMainLoop();
