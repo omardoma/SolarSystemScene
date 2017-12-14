@@ -673,16 +673,20 @@ void drawPlanets3()
 // draw rocket
 void drawRocket()
 {
-	glPushMatrix();
-	glColor3d(1, 1, 1);
-	glTranslated(X1+X2, Y, Z1+Z2);
-	//glTranslated(0, Y, 0);
-	
-	glRotated(-angle*57.3, 0, 1, 0);
-	glScaled(1, 0.5, 1);
-	glutSolidCube(5);
+	if (!firstPerson)
+	{
+		glPushMatrix();
+		glColor3d(1, 1, 1);
+		glTranslated(X1 + X2, Y, Z1 + Z2);
+		//glTranslated(0, Y, 0);
 
-	glPopMatrix();
+		glRotated(-angle*57.3, 0, 1, 0);
+		glScaled(1, 0.5, 1);
+		glutSolidCube(5);
+
+		glPopMatrix();
+	}
+	
 
 
 }
