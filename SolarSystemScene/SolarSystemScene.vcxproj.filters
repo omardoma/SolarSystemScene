@@ -140,5 +140,14 @@
     <Image Include="textures\tennis.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="textures\met1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\met2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="textures\stdlight.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

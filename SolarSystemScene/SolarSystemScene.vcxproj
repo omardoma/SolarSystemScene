@@ -182,6 +182,8 @@
     <Image Include="textures\mango.bmp" />
     <Image Include="textures\mars.bmp" />
     <Image Include="textures\mercury.bmp" />
+    <Image Include="textures\met1.bmp" />
+    <Image Include="textures\met2.bmp" />
     <Image Include="textures\mix.bmp" />
     <Image Include="textures\moon.bmp" />
     <Image Include="textures\neptune.bmp" />
@@ -190,6 +192,7 @@
     <Image Include="textures\saturn.bmp" />
     <Image Include="textures\soc.bmp" />
     <Image Include="textures\stars.bmp" />
+    <Image Include="textures\stdlight.bmp" />
     <Image Include="textures\str.bmp" />
     <Image Include="textures\sun.bmp" />
     <Image Include="textures\tennis.bmp" />
