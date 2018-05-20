@@ -2,7 +2,7 @@
 
 A 3D solar system scene using OpenGL &amp; GLUT in C++.
 
-How to use?
+## How to use?
 
 Open the .sln file in Visual Studio 2015 or later
 
